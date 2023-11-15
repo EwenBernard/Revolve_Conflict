@@ -1,26 +1,21 @@
-import pygame
-import sys
-import math
+import json
+from src.weather_data_process import get_weather_data_from_city
+
+def save_to_json(data):
+    with open("weather_data.json", "w") as f:
+        json.dump(data, f)
 
 def main():
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+    cities = ["Barcelona", "New-York", "New-Dehli", "Paris"]
 
-        screen.fill(BG_COLOR)
-
-        # Define the ray parameters
-        origin = (WIDTH // 2, HEIGHT // 2)
-        angle = pygame.time.get_ticks() % 360  # Change the angle over time
-        direction = (math.cos(math.radians(angle)), math.sin(math.radians(angle)))
-
-        # Ray trace
-        ray_trace(origin, direction, 0, 100)
-
-        pygame.display.flip()
-
+    weather_data = []
+    for city in cities:
+        city_info = {"city": city}
+        city_info["data"] = get_weather_data_from_city(city, hour=False)
+        weather_data.append(city_info)
+    print(weather_data)
+    save_to_json(weather_data)
+            
 if __name__ == "__main__":
     main()
 

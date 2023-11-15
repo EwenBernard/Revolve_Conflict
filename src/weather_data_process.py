@@ -24,13 +24,35 @@ def get_weather_info(lat, lon, hourly=True):
 
 
 def get_coords_from_city(city_name):
-    geolocator = Nominatim(user_agent="geoapiExercises")
+    geolocator = Nominatim(user_agent="geoapi")
     location = geolocator.geocode(city_name)
     if location:
         return location.latitude, location.longitude
     else:
         print("Coordinates not found for the given city.")
         return None, None
+    
+
+def get_city_coordinates(city_name):
+    base_url = "https://nominatim.openstreetmap.org/search"
+    params = {
+        "q": city_name,
+        "format": "json",
+    }
+
+    response = requests.get(base_url, params=params)
+    
+    if response.status_code == 200:
+        data = response.json()
+        if data:
+            # Assuming the first result is the most relevant one
+            latitude = data[0]["lat"]
+            longitude = data[0]["lon"]
+            return float(latitude), float(longitude)
+        else:
+            print("No results found for the given city name.")
+    else:
+        print(f"Error: {response.status_code}, {response.text}")
 
 
 def get_weather_type(weather_code):
@@ -61,6 +83,6 @@ def get_weather_type(weather_code):
     return 'Unknown weather type'
 
 
-def get_weather_data_from_city(city_name):
-    coords = get_coords_from_city(city_name)
-    return get_weather_info(coords[0], coords[1])
+def get_weather_data_from_city(city_name, hour=True):
+    coords = get_city_coordinates(city_name)
+    return get_weather_info(coords[0], coords[1], hourly=hour)
